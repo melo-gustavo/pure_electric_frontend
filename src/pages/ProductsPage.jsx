@@ -54,7 +54,7 @@ export default function ProductsPage() {
         customer: selectedUser.full_name,
         amount: product.amount,
       })
-      purchaseKeys.release(selectedUser.id, product.id)
+      purchaseKeys.confirm(selectedUser.id, product.id)
       setFeedback({
         type: 'success',
         message: created
