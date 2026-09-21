@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { createOrder } from '../api/orders'
 import ProductCard from '../components/ProductCard'
 import { useProducts } from '../hooks/useProducts'
 import { useUsers } from '../hooks/useUsers'
+import { createPurchaseKeys } from '../utils/idempotency'
 
 const USER_KEY = 'pure_electric_user_id'
 
@@ -21,6 +22,8 @@ export default function ProductsPage() {
   const [userId, setUserId] = useState(loadUserId)
   const [buyingId, setBuyingId] = useState(null)
   const [feedback, setFeedback] = useState(null)
+  const [purchaseKeys] = useState(createPurchaseKeys)
+  const inFlight = useRef(false)
 
   const selectedUser = users.find((user) => user.id === userId) ?? null
 
@@ -40,14 +43,28 @@ export default function ProductsPage() {
       return
     }
 
+    if (inFlight.current) return
+    inFlight.current = true
+
     setBuyingId(product.id)
     setFeedback(null)
     try {
-      const order = await createOrder({ customer: selectedUser.full_name, amount: product.amount })
-      setFeedback({ type: 'success', message: `Pedido de ${product.name} enviado.`, orderId: order.id })
+      const { created } = await createOrder({
+        externalId: purchaseKeys.keyFor(selectedUser.id, product.id),
+        customer: selectedUser.full_name,
+        amount: product.amount,
+      })
+      purchaseKeys.release(selectedUser.id, product.id)
+      setFeedback({
+        type: 'success',
+        message: created
+          ? `Pedido de ${product.name} enviado.`
+          : `Este pedido de ${product.name} já havia sido recebido; nada foi duplicado.`,
+      })
     } catch (err) {
-      setFeedback({ type: 'error', message: err.message })
+      setFeedback({ type: 'error', message: `${err.message} Você pode tentar de novo sem risco de duplicar o pedido.` })
     } finally {
+      inFlight.current = false
       setBuyingId(null)
     }
   }
@@ -98,6 +115,7 @@ export default function ProductsPage() {
             product={product}
             onBuy={handleBuy}
             buying={buyingId === product.id}
+            disabled={buyingId !== null}
           />
         ))}
       </div>

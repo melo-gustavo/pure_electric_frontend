@@ -1,7 +1,7 @@
 import { assetUrl } from "../api/client";
 import { formatCurrency } from "../utils/format";
 
-export default function ProductCard({ product, onBuy, buying }) {
+export default function ProductCard({ product, onBuy, buying, disabled }) {
   const image = assetUrl(product.image);
 
   return (
@@ -20,7 +20,7 @@ export default function ProductCard({ product, onBuy, buying }) {
             type="button"
             className="button"
             onClick={() => onBuy(product)}
-            disabled={buying}
+            disabled={buying || disabled}
           >
             {buying ? "Enviando…" : "Comprar"}
           </button>

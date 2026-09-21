@@ -7,7 +7,7 @@ export class ApiError extends Error {
   }
 }
 
-export async function request(path, options = {}) {
+export async function requestWithStatus(path, options = {}) {
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     headers: { 'Content-Type': 'application/json', ...options.headers },
@@ -19,7 +19,12 @@ export async function request(path, options = {}) {
     throw new ApiError(detail ?? 'Não foi possível concluir a requisição.', response.status)
   }
 
-  return response.json()
+  return { data: await response.json(), status: response.status }
+}
+
+export async function request(path, options = {}) {
+  const { data } = await requestWithStatus(path, options)
+  return data
 }
 
 export function assetUrl(path) {
