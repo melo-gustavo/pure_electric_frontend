@@ -1,23 +1,34 @@
 import { useState } from 'react'
 import StatusBadge from '../components/StatusBadge'
 import { useOrders } from '../hooks/useOrders'
+import { translateFailureReason } from '../utils/failureReason'
 import { formatCurrency, formatDateTime } from '../utils/format'
-import { isActive } from '../utils/orderStatus'
+import { pageCount, pageRange } from '../utils/pagination'
 
 const FILTERS = [
-  { key: 'all', label: 'Todos', match: () => true },
-  { key: 'active', label: 'Em andamento', match: (order) => isActive(order.status) },
-  { key: 'PROCESSED', label: 'Processados', match: (order) => order.status === 'PROCESSED' },
-  { key: 'FAILED', label: 'Falhas', match: (order) => order.status === 'FAILED' },
+  { key: 'all', label: 'Todos', statuses: [] },
+  { key: 'active', label: 'Em andamento', statuses: ['RECEIVED', 'PROCESSING'] },
+  { key: 'PROCESSED', label: 'Processados', statuses: ['PROCESSED'] },
+  { key: 'FAILED', label: 'Falhas', statuses: ['FAILED'] },
 ]
 
 export default function OrdersPage() {
-  const { orders, loading, error, updatedAt, hasActive } = useOrders()
   const [filterKey, setFilterKey] = useState('all')
-
+  const [page, setPage] = useState(0)
   const filter = FILTERS.find((item) => item.key === filterKey)
-  const sorted = [...orders].sort((a, b) => b.created_at.localeCompare(a.created_at))
-  const visible = sorted.filter(filter.match)
+  const { orders, total, loading, error, updatedAt, hasActive } = useOrders({
+    statuses: filter.statuses,
+    page,
+    onPageOverflow: setPage,
+  })
+
+  const pages = pageCount(total)
+  const range = pageRange(page, total, orders.length)
+
+  function selectFilter(key) {
+    setFilterKey(key)
+    setPage(0)
+  }
 
   return (
     <section>
@@ -42,17 +53,17 @@ export default function OrdersPage() {
             role="tab"
             aria-selected={item.key === filterKey}
             className={`chip ${item.key === filterKey ? 'chip--selected' : ''}`}
-            onClick={() => setFilterKey(item.key)}
+            onClick={() => selectFilter(item.key)}
           >
-            {item.label} ({orders.filter(item.match).length})
+            {item.label}
           </button>
         ))}
       </div>
 
       {loading && <p className="muted">Carregando pedidos…</p>}
-      {!loading && visible.length === 0 && <p className="muted">Nenhum pedido para exibir.</p>}
+      {!loading && orders.length === 0 && <p className="muted">Nenhum pedido para exibir.</p>}
 
-      {visible.length > 0 && (
+      {orders.length > 0 && (
         <div className="table-wrap">
           <table className="table">
             <thead>
@@ -66,7 +77,7 @@ export default function OrdersPage() {
               </tr>
             </thead>
             <tbody>
-              {visible.map((order) => (
+              {orders.map((order) => (
                 <tr key={order.id}>
                   <td>
                     <code>{order.external_id}</code>
@@ -75,7 +86,11 @@ export default function OrdersPage() {
                   <td>{formatCurrency(order.amount)}</td>
                   <td>
                     <StatusBadge status={order.status} />
-                    {order.failure_reason && <div className="table__reason">{order.failure_reason}</div>}
+                    {order.failure_reason && (
+                      <div className="table__reason" title={order.failure_reason}>
+                        {translateFailureReason(order.failure_reason)}
+                      </div>
+                    )}
                   </td>
                   <td>{formatDateTime(order.created_at)}</td>
                   <td>{formatDateTime(order.processed_at)}</td>
@@ -84,6 +99,25 @@ export default function OrdersPage() {
             </tbody>
           </table>
         </div>
+      )}
+
+      {total > 0 && (
+        <nav className="pagination" aria-label="Paginação de pedidos">
+          <span className="muted">
+            {range.from}–{range.to} de {total}
+          </span>
+          <div className="pagination__controls">
+            <button type="button" className="chip" disabled={page === 0} onClick={() => setPage(page - 1)}>
+              Anterior
+            </button>
+            <span>
+              Página {page + 1} de {pages}
+            </span>
+            <button type="button" className="chip" disabled={page >= pages - 1} onClick={() => setPage(page + 1)}>
+              Próxima
+            </button>
+          </div>
+        </nav>
       )}
     </section>
   )

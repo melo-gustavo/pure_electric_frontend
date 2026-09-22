@@ -1,53 +1,30 @@
 :root {
-    --bg: #f6f7f9;
-    --surface: #fff;
-    --text: #4b5563;
-    --text-h: #0f172a;
-    --border: #e5e7eb;
-    --accent: #0f766e;
-    --accent-hover: #115e59;
-    --neutral-bg: #eef0f3;
-    --neutral-fg: #475569;
-    --info-bg: #dbeafe;
-    --info-fg: #1d4ed8;
-    --success-bg: #dcfce7;
-    --success-fg: #15803d;
-    --danger-bg: #fee2e2;
-    --danger-fg: #b91c1c;
-    --shadow:
-        0 1px 3px rgba(15, 23, 42, 0.08),
-        0 8px 24px -12px rgba(15, 23, 42, 0.12);
+    --bg: #0f1115;
+    --surface: #171a21;
+    --text: #9ca3af;
+    --text-h: #f3f4f6;
+    --border: #262a33;
+    --accent: #2dd4bf;
+    --accent-hover: #5eead4;
+    --neutral-bg: #232732;
+    --neutral-fg: #cbd5e1;
+    --info-bg: #1e3a8a;
+    --info-fg: #bfdbfe;
+    --success-bg: #14532d;
+    --success-fg: #bbf7d0;
+    --danger-bg: #7f1d1d;
+    --danger-fg: #fecaca;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 
     font:
         16px/1.5 system-ui,
         "Segoe UI",
         Roboto,
         sans-serif;
-    color-scheme: light dark;
+    color-scheme: dark;
     color: var(--text);
     background: var(--bg);
     -webkit-font-smoothing: antialiased;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg: #0f1115;
-        --surface: #171a21;
-        --text: #9ca3af;
-        --text-h: #f3f4f6;
-        --border: #262a33;
-        --accent: #2dd4bf;
-        --accent-hover: #5eead4;
-        --neutral-bg: #232732;
-        --neutral-fg: #cbd5e1;
-        --info-bg: #1e3a8a;
-        --info-fg: #bfdbfe;
-        --success-bg: #14532d;
-        --success-fg: #bbf7d0;
-        --danger-bg: #7f1d1d;
-        --danger-fg: #fecaca;
-        --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-    }
 }
 
 * {
@@ -205,7 +182,7 @@ a {
     padding: 8px 18px;
     font: inherit;
     font-weight: 600;
-    color: #fff;
+    color: #042f2e;
     background: var(--accent);
     border: 0;
     border-radius: 8px;
@@ -221,11 +198,6 @@ a {
     cursor: progress;
 }
 
-@media (prefers-color-scheme: dark) {
-    .button {
-        color: #042f2e;
-    }
-}
 
 .alert {
     margin-bottom: 20px;
@@ -383,4 +355,24 @@ a {
     .badge__pulse {
         animation: none;
     }
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.pagination__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pagination .chip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

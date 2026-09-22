@@ -1,7 +1,8 @@
 import { request, requestWithStatus } from './client'
+import { buildOrdersQuery } from '../utils/pagination'
 
-export function listOrders() {
-  return request('/orders')
+export function listOrders(options) {
+  return request(`/orders?${buildOrdersQuery(options)}`)
 }
 
 export async function createOrder({ externalId, customer, amount }) {
