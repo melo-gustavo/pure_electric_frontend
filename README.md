@@ -1,16 +1,47 @@
-# React + Vite
+# Pure Electric — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interface em React (Vite) para consulta de produtos e pedidos, consumindo a API do
+repositório `pure_electric_backend`.
 
-Currently, two official plugins are available:
+## Pré-requisitos
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Node.js 20+
+- [pnpm](https://pnpm.io/installation)
 
-## React Compiler
+## Instalação
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+pnpm install
+```
 
-## Expanding the ESLint configuration
+## Configuração
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+cp .env.example .env
+```
+
+| Variável      | Uso                                                                                                                  |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `VITE_API_URL` | Base da API usada pelo app em runtime. Local: `/api` (via proxy do Vite, abaixo). Produção: URL pública da API no Railway, sem barra final. |
+| `BACKEND_URL`  | Só para o `dev`: para onde o proxy `/api` do Vite encaminha as chamadas. Padrão `http://localhost:8000` se não definida. |
+
+## Rodando
+
+```bash
+pnpm dev       # http://localhost:5173, com proxy /api -> backend local
+pnpm build     # build de produção em dist/
+pnpm preview   # serve o build de dist/ localmente
+```
+
+## Testes e lint
+
+```bash
+pnpm test
+pnpm lint
+```
+
+## Deploy
+
+Publicado na Vercel (preset Vite). `VITE_API_URL` é lida no build, então trocar o
+valor exige um novo deploy. Detalhes em `pure_electric_backend/README.md` (seção
+"Deploy").
